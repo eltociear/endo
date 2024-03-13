@@ -194,15 +194,15 @@ export const makeHostLogMembraneKit = (guestTarget, hostLog) => {
           }),
         );
         const promiseLogIndex = hostLog.length;
-        hostLog.push(['bind guest promise', hostCap, promiseLogIndex]);
+        hostLog.push(['bindGuestPromise', hostCap, promiseLogIndex]);
         const guestResolve = guestFulfillment => {
           const hostFulfillment = guestToHost(guestFulfillment);
-          hostLog.push(['check fulfill', promiseLogIndex, hostFulfillment]);
+          hostLog.push(['checkFulfill', promiseLogIndex, hostFulfillment]);
           hostResolve(hostFulfillment);
         };
         const guestReject = guestReason => {
           const hostReason = guestToHost(guestReason);
-          hostLog.push(['check reject', promiseLogIndex, hostReason]);
+          hostLog.push(['checkReject', promiseLogIndex, hostReason]);
           hostReject(hostReason);
         };
         E.when(
@@ -241,7 +241,7 @@ export const makeHostLogMembraneKit = (guestTarget, hostLog) => {
             let guestResult;
 
             const callLogIndex = hostLog.length;
-            hostLog.push(['do call', hostCap, optVerb, hostArgs, callLogIndex]);
+            hostLog.push(['doCall', hostCap, optVerb, hostArgs, callLogIndex]);
 
             try {
               guestResult = optVerb
@@ -249,11 +249,11 @@ export const makeHostLogMembraneKit = (guestTarget, hostLog) => {
                 : guestCapIf(...guestArgs);
             } catch (guestReason) {
               const yourReason = guestToHost(harden(guestReason));
-              hostLog.push(['check throw', callLogIndex, yourReason]);
+              hostLog.push(['checkThrow', callLogIndex, yourReason]);
               throw yourReason;
             }
             const yourResult = guestToHost(harden(guestResult));
-            hostLog.push(['check return', callLogIndex, yourResult]);
+            hostLog.push(['checkReturn', callLogIndex, yourResult]);
             return yourResult;
           };
           if (optVerb) {

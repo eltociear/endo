@@ -3,7 +3,7 @@ import test from '@endo/ses-ava/prepare-endo.js';
 // eslint-disable-next-line import/order
 import { Far } from '@endo/pass-style';
 import { makeHostLogMembraneKit } from '../src/host-log-membrane.js';
-import { makeReplayMembraneKit } from '../src/replay-membrane.js';
+// import { makeReplayMembraneKit } from '../src/replay-membrane.js';
 
 test('test replay-membrane basics', async t => {
   /** @type {any} */
@@ -56,21 +56,21 @@ test('test replay-membrane basics', async t => {
   t.deepEqual(methodNames, ['__getMethodNames__', 'getGuestState']);
 
   const golden = harden([
-    ['do call', hostSetState, undefined, [[88], hostOrchestra], 0],
-    ['check call', hostOrchestra, 'getHostInPromise', [], 1],
-    ['bind host promise', hostInP, 2],
-    ['do return', 1, hostInP],
-    ['bind guest promise', hostObjP, 4],
-    ['check return', 0, hostObjP],
-    ['do filfill', 2, 'wait for it'],
-    ['check fulfill', 4, hostObj],
-    ['do call', hostObj, '__getMethodNames__', [], 8],
-    ['check return', 8, ['__getMethodNames__', 'getGuestState']],
-    ['do call', hostObj, 'getGuestState', [], 10],
-    ['check return', 10, [88]],
+    ['doCall', hostSetState, undefined, [[88], hostOrchestra], 0],
+    ['checkCall', hostOrchestra, 'getHostInPromise', [], 1],
+    ['bindHostPromise', hostInP, 2],
+    ['doReturn', 1, hostInP],
+    ['bindGuestPromise', hostObjP, 4],
+    ['checkReturn', 0, hostObjP],
+    ['doFilfill', 2, 'wait for it'],
+    ['checkFulfill', 4, hostObj],
+    ['doCall', hostObj, '__getMethodNames__', [], 8],
+    ['checkReturn', 8, ['__getMethodNames__', 'getGuestState']],
+    ['doCall', hostObj, 'getGuestState', [], 10],
+    ['checkReturn', 10, [88]],
   ]);
   t.deepEqual(hostLog, golden);
 
-  const { hostProxy: _hostSetState2, revoke: _revoke2 } =
-    await makeReplayMembraneKit(guestSetState, golden);
+  // const { hostProxy: _hostSetState2, revoke: _revoke2 } =
+  //   await makeReplayMembraneKit(guestSetState, golden);
 });

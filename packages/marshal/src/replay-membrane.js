@@ -33,11 +33,12 @@ export const makeReplayMembraneKit = async (guestTarget, hostLog) => {
 
   const promiseBindings = new Map();
 
-  const doHostLog = entry => { };
-  const checkHostLog = entry => { };
-  const nestInterpreter = callIndex => { };
-  const unnestInterpreter = callIndex => { };
+  const doHostLog = entry => {};
+  const checkHostLog = entry => {};
+  const nestInterpreter = callIndex => {};
+  const unnestInterpreter = callIndex => {};
 
+  // eslint-disable-next-line no-unused-vars
   const dispatch = harden({
     bindHostPromise(hostP, promiseIndex) {
       let guestResolve;
@@ -49,7 +50,8 @@ export const makeReplayMembraneKit = async (guestTarget, hostLog) => {
         }),
       );
       doHostLog(['bindHostPromise', hostP, promiseIndex]);
-      const hostResolve = hostFulfillment => guestResolve(hostToGuest(hostFulfillment));
+      const hostResolve = hostFulfillment =>
+        guestResolve(hostToGuest(hostFulfillment));
       const hostReject = hostReason => guestReject(hostToGuest(hostReason));
       promiseBindings.set(promiseIndex, { hostResolve, hostReject });
       return guestP;
@@ -57,9 +59,7 @@ export const makeReplayMembraneKit = async (guestTarget, hostLog) => {
 
     doFulfill(promiseIndex, hostFulfillment) {
       doHostLog(['doFulfill', hostFulfillment]);
-      promiseBindings
-        .get(promiseIndex)
-        .hostResolve(hostFulfillment);
+      promiseBindings.get(promiseIndex).hostResolve(hostFulfillment);
     },
 
     doReject(promiseIndex, hostReason) {
