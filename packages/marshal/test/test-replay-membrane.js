@@ -2,6 +2,7 @@ import test from '@endo/ses-ava/prepare-endo.js';
 
 // eslint-disable-next-line import/order
 import { Far } from '@endo/pass-style';
+import { makeHostLogMembraneKit } from '../src/host-log-membrane.js';
 import { makeReplayMembraneKit } from '../src/replay-membrane.js';
 
 test('test replay-membrane basics', async t => {
@@ -21,7 +22,7 @@ test('test replay-membrane basics', async t => {
     },
   );
   const hostLog = [];
-  const { hostProxy: hostSetState, revoke } = makeReplayMembraneKit(
+  const { hostProxy: hostSetState, revoke } = makeHostLogMembraneKit(
     guestSetState,
     hostLog,
   );
@@ -69,4 +70,7 @@ test('test replay-membrane basics', async t => {
     ['check return', 10, [88]],
   ]);
   t.deepEqual(hostLog, golden);
+
+  const { hostProxy: _hostSetState2, revoke: _revoke2 } =
+    await makeReplayMembraneKit(guestSetState, golden);
 });

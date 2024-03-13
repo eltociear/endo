@@ -18,7 +18,7 @@ const { fromEntries, defineProperties } = Object;
  * @param {import('@endo/pass-style').Passable} guestTarget
  * @param {any[]} hostLog
  */
-export const makeReplayMembraneKit = async (guestTarget, hostLog) => {
+export const makeHostLogMembraneKit = (guestTarget, hostLog) => {
   /** @type {WeakMap<any,any> | undefined} */
   let memoH2G = new WeakMap();
   /** @type {WeakMap<any,any> | undefined} */
@@ -30,96 +30,6 @@ export const makeReplayMembraneKit = async (guestTarget, hostLog) => {
     memoG2H = undefined;
     optReasonString = reasonString;
   };
-
-  const promiseBindings = new Map();
-
-  const doHostLog = entry => { };
-  const checkHostLog = entry => { };
-  const nestInterpreter = callIndex => { };
-  const unnestInterpreter = callIndex => { };
-
-  const dispatch = harden({
-    bindHostPromise(hostP, promiseIndex) {
-      let guestResolve;
-      let guestReject;
-      const guestP = harden(
-        new Promise((res, rej) => {
-          guestResolve = res;
-          guestReject = rej;
-        }),
-      );
-      doHostLog(['bindHostPromise', hostP, promiseIndex]);
-      const hostResolve = hostFulfillment => guestResolve(hostToGuest(hostFulfillment));
-      const hostReject = hostReason => guestReject(hostToGuest(hostReason));
-      promiseBindings.set(promiseIndex, { hostResolve, hostReject });
-      return guestP;
-    },
-
-    doFulfill(promiseIndex, hostFulfillment) {
-      doHostLog(['doFulfill', hostFulfillment]);
-      promiseBindings
-        .get(promiseIndex)
-        .hostResolve(hostFulfillment);
-    },
-
-    doReject(promiseIndex, hostReason) {
-      doHostLog(['doReject', hostReason]);
-      promiseBindings.get(promiseIndex).hostReject(hostReason);
-    },
-
-    checkCall(guestCap, optVerb, guestArgs, callIndex) {
-      checkHostLog([
-        'checkCall',
-        guestToHost(guestCap),
-        optVerb,
-        guestToHost(guestArgs),
-        callIndex,
-      ]);
-      return nestInterpreter(callIndex);
-    },
-
-    doReturn(callIndex, hostResult) {
-      doHostLog(['doReturn', hostResult]);
-      unnestInterpreter(callIndex);
-      return hostToGuest(hostResult);
-    },
-
-    doThrow(callIndex, hostReason) {
-      doHostLog(['doThrow', hostReason]);
-      unnestInterpreter(callIndex);
-      throw hostToGuest(hostReason);
-    },
-
-    // /////////////////////////////////////////////////////////////////////////
-
-    bindGuestPromise(guestP, promiseIndex) {
-      const hostP = guestToHost(guestP);
-      doHostLog(['bindGuestPromise', hostP, promiseIndex]);
-      return hostP;
-    },
-
-    checkFulfill(promiseIndex, guestFulfillment) {
-      const hostFulfillment = guestToHost(guestFulfillment);
-      checkHostLog(['checkFulfill', promiseIndex, hostFulfillment]);
-    },
-
-    checkReject(promiseIndex, guestReason) {
-      const hostReason = guestToHost(guestReason);
-      checkHostLog(['checkReject', promiseIndex, hostReason]);
-    },
-
-    doCall(hostCap, optVerb, hostArgs, callIndex) {
-      // /
-    },
-
-    checkReturn(callIndex, guestResult) {
-      // /
-    },
-
-    checkThrow(callIndex, guestReason) {
-      // /
-    },
-  });
 
   const convertCapH2G = (hostCap, _optIface = undefined) => {
     if (memoH2G === undefined) {
@@ -142,13 +52,13 @@ export const makeReplayMembraneKit = async (guestTarget, hostLog) => {
           }),
         );
         const promiseLogIndex = hostLog.length;
-        hostLog.push(['bind host promise', hostCap, promiseLogIndex]);
+        hostLog.push(['bindHostPromise', hostCap, promiseLogIndex]);
         const hostResolve = hostFulfillment => {
-          hostLog.push(['do filfill', promiseLogIndex, hostFulfillment]);
+          hostLog.push(['doFilfill', promiseLogIndex, hostFulfillment]);
           guestResolve(hostToGuest(hostFulfillment));
         };
         const hostReject = hostReason => {
-          hostLog.push(['do reject', promiseLogIndex, hostReason]);
+          hostLog.push(['doReject', promiseLogIndex, hostReason]);
           guestReject(hostToGuest(hostReason));
         };
         E.when(
@@ -188,7 +98,7 @@ export const makeReplayMembraneKit = async (guestTarget, hostLog) => {
 
             const callLogIndex = hostLog.length;
             hostLog.push([
-              'check call',
+              'checkCall',
               hostCap,
               optVerb,
               hostArgs,
@@ -201,11 +111,11 @@ export const makeReplayMembraneKit = async (guestTarget, hostLog) => {
                 : hostCapIf(...hostArgs);
             } catch (hostReason) {
               const guestReason = hostToGuest(harden(hostReason));
-              hostLog.push(['do throw', callLogIndex, hostReason]);
+              hostLog.push(['doThrow', callLogIndex, hostReason]);
               throw guestReason;
             }
             const guestResult = hostToGuest(harden(hostResult));
-            hostLog.push(['do return', callLogIndex, hostResult]);
+            hostLog.push(['doReturn', callLogIndex, hostResult]);
             return guestResult;
           };
           if (optVerb) {
@@ -405,4 +315,4 @@ export const makeReplayMembraneKit = async (guestTarget, hostLog) => {
     revoke,
   });
 };
-harden(makeReplayMembraneKit);
+harden(makeHostLogMembraneKit);
