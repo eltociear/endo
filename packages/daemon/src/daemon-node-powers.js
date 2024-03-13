@@ -482,7 +482,6 @@ export const makeCryptoPowers = crypto => {
 };
 
 /**
- * @param {(URL) => string} fileURLToPath
  * @param {import('./types.js').FilePowers} filePowers
  * @param {import('./types.js').CryptoPowers} cryptoPowers
  * @param {import('./types.js').Locator} locator
@@ -490,7 +489,6 @@ export const makeCryptoPowers = crypto => {
  * @returns {import('./types.js').DaemonicPersistencePowers}
  */
 export const makeDaemonicPersistencePowers = (
-  fileURLToPath,
   filePowers,
   cryptoPowers,
   locator,
@@ -769,7 +767,6 @@ export const makeDaemonicPowers = ({
 
   const petStorePowers = makePetStoreMaker(filePowers, locator);
   const daemonicPersistencePowers = makeDaemonicPersistencePowers(
-    fileURLToPath,
     filePowers,
     cryptoPowers,
     locator,

@@ -123,6 +123,10 @@ type ReadableBlobFormula = {
   content: string;
 };
 
+export type ReadableBlobDeferredTaskParams = {
+  readableBlobFormulaIdentifier: string;
+};
+
 type LookupFormula = {
   type: 'lookup';
 
@@ -827,7 +831,8 @@ export interface DaemonCore {
     deferredTasks: DeferredTasks<PartyDeferredTaskParams>,
   ) => IncarnateResult<EndoGuest>;
   incarnateReadableBlob: (
-    contentSha512: string,
+    readerRef: ERef<AsyncIterableIterator<string>>,
+    deferredTasks: DeferredTasks<ReadableBlobDeferredTaskParams>,
   ) => IncarnateResult<FarEndoReadable>;
   incarnateEval: (
     hostFormulaIdentifier: string,
@@ -866,9 +871,6 @@ export interface DaemonCore {
   incarnateNetworksDirectory: () => IncarnateResult<EndoDirectory>;
   incarnateLoopbackNetwork: () => IncarnateResult<EndoNetwork>;
   cancelValue: (formulaIdentifier: string, reason: Error) => Promise<void>;
-  storeReaderRef: (
-    readerRef: ERef<AsyncIterableIterator<string>>,
-  ) => Promise<string>;
   makeMailbox: MakeMailbox;
   makeDirectoryNode: MakeDirectoryNode;
 }
