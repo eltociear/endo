@@ -78,6 +78,13 @@ type WorkerFormula = {
 /**
  * Deferred tasks parameters for `host` and `guest` formulas.
  */
+export type WorkerDeferredTaskParams = {
+  workerFormulaIdentifier: string;
+};
+
+/**
+ * Deferred tasks parameters for `host` and `guest` formulas.
+ */
 export type PartyDeferredTaskParams = {
   partyFormulaIdentifier: string;
 };
@@ -810,7 +817,9 @@ export interface DaemonCore {
   incarnateEndoBootstrap: (
     specifiedFormulaNumber: string,
   ) => IncarnateResult<FarEndoBootstrap>;
-  incarnateWorker: () => IncarnateResult<EndoWorker>;
+  incarnateWorker: (
+    deferredTasks: DeferredTasks<WorkerDeferredTaskParams>,
+  ) => IncarnateResult<EndoWorker>;
   incarnateDirectory: () => IncarnateResult<EndoDirectory>;
   incarnateHost: (
     endoFormulaIdentifier: string,

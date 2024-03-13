@@ -122,23 +122,23 @@ export const makeHostMaker = ({
      * @param {string} workerName
      */
     const provideWorker = async workerName => {
-      if (typeof workerName !== 'string') {
-        throw new Error('worker name must be string');
-      }
-      let workerFormulaIdentifier = petStore.identifyLocal(workerName);
-      if (workerFormulaIdentifier === undefined) {
-        ({ formulaIdentifier: workerFormulaIdentifier } =
-          await incarnateWorker());
-        assertPetName(workerName);
-        await petStore.write(workerName, workerFormulaIdentifier);
-      } else if (!workerFormulaIdentifier.startsWith('worker:')) {
-        throw new Error(`Not a worker ${q(workerName)}`);
-      }
-      return /** @type {Promise<import('./types.js').EndoWorker>} */ (
-        // Behold, recursion:
-        // eslint-disable-next-line no-use-before-define
-        provideValueForFormulaIdentifier(workerFormulaIdentifier)
+      /** @type {import('./types.js').DeferredTasks<import('./types.js').WorkerDeferredTaskParams>} */
+      const tasks = makeDeferredTasks();
+      // eslint-disable-next-line no-use-before-define
+      const workerFormulaIdentifier = prepareWorkerFormulaIdentifier(
+        workerName,
+        tasks.push,
       );
+
+      if (workerFormulaIdentifier !== undefined) {
+        return /** @type {Promise<import('./types.js').EndoWorker>} */ (
+          // Behold, recursion:
+          provideValueForFormulaIdentifier(workerFormulaIdentifier)
+        );
+      }
+
+      const { value } = await incarnateWorker(tasks);
+      return value;
     };
 
     /**
@@ -159,6 +159,11 @@ export const makeHostMaker = ({
         deferTask(identifiers =>
           petStore.write(workerName, identifiers.workerFormulaIdentifier),
         );
+      } else {
+        const { type } = parseId(workerFormulaIdentifier);
+        if (type !== undefined && type !== 'worker') {
+          throw new Error(`Not a worker ${q(workerName)}`);
+        }
       }
       return workerFormulaIdentifier;
     };
